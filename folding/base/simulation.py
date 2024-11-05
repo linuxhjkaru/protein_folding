@@ -61,9 +61,6 @@ class OpenMMSimulation(GenericSimulation):
         print(
             f"Deleting water took {time.time() - start_time:.4f} seconds"
         )
-        print('New system has', modeller.topology.getNumChains(), 'chains')
-        print('New system has', modeller.topology.getNumResidues(), 'residues')
-        print('New system has', modeller.topology.getNumAtoms(), 'atoms')
         # modeller.addExtraParticles(forcefield)
 
         start_time = time.time()

@@ -173,12 +173,15 @@ def cpt_file_mapper(output_dir: str, state: str):
 
 
 if __name__ == "__main__":
-    num_experiments = 10
-    temperatures = [50, 100, 200, 300, 400, 500]
-    friction = 1.1
+    num_experiments = 1
+    temperatures = [300]
+    # temperatures = [50, 100, 200, 300, 400, 500]
+    friction = 1
     pdbs_to_exclude = []
 
     while num_experiments > 0:
+        # You can specific your pdb_id for testing more
+        # pdb_id = "a123"
         pdb_id = PDB_ID
         system_kwargs = {"temperature": temperatures[0], "friction": friction}
 

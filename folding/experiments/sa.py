@@ -48,7 +48,7 @@ def configure_commands(
     run_before_annealing: int,
     annealing_loop: int,
     middle_cpt: int,
-    CHECKPOINT_INTERVAL: int = 10000,
+    CHECKPOINT_INTERVAL: int = CHECKPOINT_INTERVAL,
     STATE_DATA_REPORTER_INTERVAL: int = 10,
     EXIT_REPORTER_INTERVAL: int = 10,
 ) -> Dict[str, List[str]]:
