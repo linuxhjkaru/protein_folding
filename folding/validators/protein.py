@@ -366,17 +366,16 @@ class Protein(OpenMMSimulation):
             os.remove(os.path.join(directory, file))
         # os.rmdir(output_directory)
 
-    def get_miner_data_directory(self, hotkey: str):
+    def get_miner_data_directory(self):
         self.miner_data_directory = os.path.join(self.validator_directory)
 
     def process_md_output(
-        self, md_output: dict, seed: int, state: str, hotkey: str
+        self, md_output: dict, seed: int, state: str
     ) -> bool:
         MIN_LOGGING_ENTRIES = 500
         MIN_SIMULATION_STEPS = 5000
 
         required_files_extensions = ["cpt", "log"]
-        self.hotkey_alias = hotkey[:8]
         self.current_state = state
 
         # This is just mapper from the file extension to the name of the file stores in the dict.
@@ -386,7 +385,7 @@ class Protein(OpenMMSimulation):
 
         if len(md_output.keys()) == 0:
             print(
-                f"Miner {self.hotkey_alias} returned empty md_output... Skipping!"
+                f"Returned empty md_output... Skipping!"
             )
             return False
 
@@ -395,7 +394,7 @@ class Protein(OpenMMSimulation):
                 print(f"Missing file with extension {ext} in md_output")
                 return False
 
-        self.get_miner_data_directory(hotkey=hotkey)
+        self.get_miner_data_directory()
 
         # Save files so we can check the hash later.
         # self.save_files(
@@ -408,7 +407,7 @@ class Protein(OpenMMSimulation):
             # make sure that we are using the correct seed.
 
             print(
-                f"Recreating miner {self.hotkey_alias} simulation in state: {self.current_state}"
+                f"Recreating simulation in state: {self.current_state}"
             )
             self.simulation, _, self.system_config = self.create_simulation(
                 pdb=self.load_pdb_file(pdb_file=self.pdb_location),
@@ -433,7 +432,7 @@ class Protein(OpenMMSimulation):
             # Checks to see if we have enough steps in the log file to start validation
             if len(self.log_file) < MIN_LOGGING_ENTRIES:
                 raise ValidationError(
-                    f"Miner {self.hotkey_alias} did not run enough steps in the simulation... Skipping!"
+                    f"Did not run enough steps in the simulation... Skipping!"
                 )
 
             # Make sure that we are enough steps ahead in the log file compared to the checkpoint file.
@@ -445,7 +444,7 @@ class Protein(OpenMMSimulation):
                 )
                 if os.path.exists(checkpoint_path):
                     print(
-                        f"Miner {self.hotkey_alias} did not run enough steps since last checkpoint... Loading old checkpoint"
+                        f"Did not run enough steps since last checkpoint... Loading old checkpoint"
                     )
                     self.simulation.loadCheckpoint(checkpoint_path)
                     # Checking to see if the old checkpoint has enough steps to validate
@@ -453,19 +452,19 @@ class Protein(OpenMMSimulation):
                         self.log_step - self.simulation.currentStep
                     ) < MIN_SIMULATION_STEPS:
                         raise ValidationError(
-                            f"Miner {self.hotkey_alias} did not run enough steps in the simulation... Skipping!"
+                            f"Did not run enough steps in the simulation... Skipping!"
                         )
                 else:
                     raise ValidationError(
-                        f"Miner {self.hotkey_alias} did not run enough steps and no old checkpoint found... Skipping!"
+                        f"Did not run enough steps and no old checkpoint found... Skipping!"
                     )
 
             self.cpt_step = self.simulation.currentStep
             self.checkpoint_path = checkpoint_path
 
-            # Save the system config to the miner data directory
+            # Save the system config to the data directory
             system_config_path = os.path.join(
-                self.miner_data_directory, f"miner_system_config_{seed}.pkl"
+                self.miner_data_directory, f"system_config_{seed}.pkl"
             )
             if not os.path.exists(system_config_path):
                 write_pkl(
